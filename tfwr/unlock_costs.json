@@ -1,0 +1,190 @@
+{
+    "Auto_Unlock": [
+        {"Pumpkin": 5000}
+    ],
+    "Cactus": [
+            {"Pumpkin": 5000},
+            {"Pumpkin": 20000},
+            {"Pumpkin": 120000},
+            {"Pumpkin": 720000},
+            {"Pumpkin": 4320000},
+            {"Pumpkin": 25900000}
+    ],
+    "Carrots": [
+        {"Wood": 50},
+        {"Wood": 250},
+        {"Wood": 1250},
+        {"Wood": 6250},
+        {"Wood": 31200},
+        {"Wood": 156000},
+        {"Wood": 781000},
+        {"Wood": 3910000},
+        {"Wood": 19500000},
+        {"Wood": 97700000}
+    ],
+    "Costs": [
+        {"Pumpkin": 2500}
+    ],
+    "Debug": [
+        {"Hay": 50, "Wood": 50}
+    ],
+    "Debug_2": [
+        {"Gold": 500}
+    ],
+    "Dictionaries": [
+        {"Pumpkin": 2500}
+    ],
+    "Dinosaurs": [
+        {"Cactus": 2000},
+        {"Cactus": 12000},
+        {"Cactus": 72000},
+        {"Cactus": 432000},
+        {"Cactus": 2590000},
+        {"Cactus": 15600000}
+    ],
+    "Expand": [
+        {"Hay": 30},
+        {"Wood": 20},
+        {"Wood": 30, "Carrot": 20},
+        {"Wood": 100, "Carrot": 50},
+        {"Pumpkin": 1000},
+        {"Pumpkin": 8000},
+        {"Pumpkin": 64000},
+        {"Pumpkin": 512000},
+        {"Pumpkin": 4100000}
+    ],
+    "Fertilizer": [
+        {"Wood": 500},
+        {"Wood": 1500},
+        {"Wood": 9000},
+        {"Wood": 54000}
+    ],
+    "Functions": [
+        {"Carrot": 40}
+    ],
+    "Grass": [
+        {},
+        {"Hay": 300},
+        {"Wood": 500},
+        {"Wood": 2500},
+        {"Wood": 12500},
+        {"Wood": 62500},
+        {"Wood": 312000},
+        {"Wood": 1560000},
+        {"Wood": 7810000},
+        {"Wood": 39100000}
+    ],
+    "Hats": [
+        {"Hay": 50}
+    ],
+    "Import": [
+        {"Carrot": 80}
+    ],
+    "Leaderboard": [
+        {"Bone": 2000000, "Gold": 1000000}
+    ],
+    "Lists": [
+        {"Carrot": 500}
+    ],
+    "Loops": [
+        {"Hay": 5}
+    ],
+    "Mazes": [
+        {"Weird_Substance": 1000},
+        {"Cactus": 12000},
+        {"Cactus": 72000},
+        {"Cactus": 432000},
+        {"Cactus": 2590000},
+        {"Cactus": 15600000}
+    ],
+    "Megafarm": [
+        {"Gold": 2000},
+        {"Gold": 8000},
+        {"Gold": 32000},
+        {"Gold": 128000},
+        {"Gold": 512000}
+    ],
+    "Operators": [
+        {"Hay": 150, "Wood": 10}
+    ],
+    "Plant": [
+        {"Hay": 50}
+    ],
+    "Polyculture": [
+        {"Pumpkin": 3000},
+        {"Bone": 10000},
+        {"Bone": 50000},
+        {"Bone": 250000},
+        {"Bone": 1250000}
+    ],
+    "Pumpkins": [
+        {"Wood": 500, "Carrot": 200},
+        {"Carrot": 1000},
+        {"Carrot": 4000},
+        {"Carrot": 16000},
+        {"Carrot": 64000},
+        {"Carrot": 256000},
+        {"Carrot": 1020000},
+        {"Carrot": 4100000},
+        {"Carrot": 16400000},
+        {"Carrot": 65500000}
+    ],
+    "Senses": [
+        {"Hay": 100}
+    ],
+    "Simulation": [
+        {"Gold": 5000}
+    ],
+    "Speed": [
+        {"Hay": 20},
+        {"Wood": 20},
+        {"Wood": 50, "Carrot": 50},
+        {"Carrot": 500},
+        {"Carrot": 1000}
+    ],
+    "Sunflowers": [
+        {"Carrot": 500}
+    ],
+    "Question_Mark": [
+        {"Bone": 100000000}
+    ],
+    "Timing": [
+        {"Pumpkin": 1000}
+    ],
+    "Top_Hat": [{
+        "Hay": 1000000000,
+        "Wood": 10000000000,
+        "Carrot": 1000000000,
+        "Cactus": 1000000000,
+        "Gold": 100000000
+    }],
+    "Trees": [
+        {"Wood": 50, "Carrot": 70},
+        {"Hay": 300},
+        {"Hay": 1200},
+        {"Hay": 4800},
+        {"Hay": 19200},
+        {"Hay": 76800},
+        {"Hay": 307000},
+        {"Hay": 1230000},
+        {"Hay": 4920000},
+        {"Hay": 19700000}
+    ],
+    "Utilities": [
+        {"Pumpkin": 1000}
+    ],
+    "Variables": [
+        {"Carrot": 35}
+    ],
+    "Watering": [
+        {"Wood": 50},
+        {"Wood": 200},
+        {"Wood": 800},
+        {"Wood": 3200},
+        {"Wood": 12800},
+        {"Wood": 51200},
+        {"Wood": 205000},
+        {"Wood": 819000},
+        {"Wood": 3280000}
+    ]
+}
