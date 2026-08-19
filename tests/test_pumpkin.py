@@ -1,7 +1,7 @@
-from tfwr.sim import *
-from tfwr.common import North, South, East, West
 import tests.test_utils as utility
-from tfwr.sim import _farm
+from tfwr.common import East, North, South, West  # noqa: F401
+from tfwr.sim import *
+
 
 # Test predates timing/growth functionality
 def plant_pumpkin() -> None:
@@ -14,6 +14,7 @@ def plant_pumpkin() -> None:
         move(West)
         move(West)
         move(North)
+
 
 # Test postdates timing/growth functionality
 def p_test() -> None:
@@ -29,5 +30,6 @@ def p_test() -> None:
             move(North)
         print_pumpkins()
         print("\n\n")
+
 
 p_test()

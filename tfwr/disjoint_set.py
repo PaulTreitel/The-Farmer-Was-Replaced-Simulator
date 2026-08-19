@@ -23,8 +23,8 @@
 # SOFTWARE.
 
 from __future__ import annotations
+
 import copy
-from typing import Any, TypeVar
 import sys
 from collections import defaultdict
 from collections.abc import Iterable, Iterator
@@ -37,6 +37,7 @@ else:
 
 T = TypeVar("T")
 
+
 class IdentityDict(dict[T, T]):
     """A defaultdict implementation which places the requested key as its value in case it's missing."""
 
@@ -46,6 +47,7 @@ class IdentityDict(dict[T, T]):
     def __missing__(self, key: T) -> T:
         self[key] = key
         return key
+
 
 class InvalidInitialMappingError(RuntimeError):
     """Runtime error raised when invalid initial mapping causes the find() methods to change during iteration."""
@@ -83,7 +85,7 @@ class DisjointSet(Generic[T]):
             if v in self._rev_data:
                 self._rev_data[v].add(k)
             else:
-                self._rev_data[v] = set([k])
+                self._rev_data[v] = {k}
 
     @classmethod
     def from_iterable(cls, iterable: Iterable[T]) -> DisjointSet[T]:
@@ -142,7 +144,7 @@ class DisjointSet(Generic[T]):
     def __iter__(self) -> Iterator[tuple[T, T]]:
         """Iterate over items and their canonical elements."""
         try:
-            for key in self._data.keys():
+            for key in self._data:
                 yield key, self.find(key)
         except RuntimeError as e:
             raise InvalidInitialMappingError() from e
@@ -226,7 +228,7 @@ class DisjointSet(Generic[T]):
         if subset in self._rev_data:
             self._rev_data[subset].add(item)
         else:
-            self._rev_data[subset] = set([item])
+            self._rev_data[subset] = {item}
 
     def remove_subset(self, item: T) -> None:
         """Remove the subset containing the given item. Does nothing if the item does not exist."""

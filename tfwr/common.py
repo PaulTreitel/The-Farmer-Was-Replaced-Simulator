@@ -1,8 +1,5 @@
-from tarfile import AbsolutePathError
 import json
 from enum import Enum
-
-
 
 ###########################
 ####                   ####
@@ -11,15 +8,17 @@ from enum import Enum
 ###########################
 
 
-
 class UnlockError(Exception):
     pass
+
 
 class EntityTypeError(Exception):
     pass
 
+
 class ItemError(Exception):
     pass
+
 
 class Direction(Enum):
     North = "North"
@@ -30,12 +29,14 @@ class Direction(Enum):
     def __repr__(self):
         return self.name
 
+
 class Grounds(Enum):
     Grassland = 0
     Soil = 1
 
     def __repr__(self):
         return f"Grounds.{self.name}"
+
 
 class Entities(Enum):
     Grass = "Grass"
@@ -54,6 +55,7 @@ class Entities(Enum):
     def __repr__(self):
         return f"Entities.{self.name}"
 
+
 class Items(Enum):
     Hay = "Hay"
     Wood = "Wood"
@@ -69,6 +71,7 @@ class Items(Enum):
 
     def __repr__(self):
         return f"Items.{self.name}"
+
 
 class Unlocks(Enum):
     Hats = "Hats"
@@ -109,6 +112,7 @@ class Unlocks(Enum):
     def __repr__(self):
         return f"Unlocks.{self.name}"
 
+
 class Hats(Enum):
     Straw_Hat = "Straw_Hat"
     Brown_Hat = "Brown_Hat"
@@ -130,12 +134,9 @@ class Hats(Enum):
     def __repr__(self):
         return f"Hats.{self.name}"
 
+
 Coords = tuple[int, int]
 Companion = tuple[Entities, int, int]
-# Type annotations are very annoying about int/float vs numbers.Number
-# so this is my hacky solution.
-Numeric = int | float 
-
 
 
 ###########################
@@ -160,7 +161,8 @@ def _load_costs() -> dict[Unlocks, list[dict[Items, int]]]:
             cost_list.append(level_cost)
         unlock_costs[u] = cost_list
     return unlock_costs
-    
+
+
 UNLOCK_COSTS = _load_costs()
 
 UNLOCK_PREREQS = {
@@ -209,7 +211,7 @@ BASE_PLANT_COSTS = {
     Entities.Pumpkin: {Items.Carrot: 1},
     Entities.Dead_Pumpkin: {Items.Carrot: 1},
     Entities.Apple: {Items.Cactus: 2},
-    Entities.Dinosaur: {Items.Cactus: 2}
+    Entities.Dinosaur: {Items.Cactus: 2},
 }
 
 PLANT_COST_MULTS = {
@@ -221,7 +223,7 @@ PLANT_COST_MULTS = {
     Entities.Pumpkin: [1, 2, 4, 8, 16, 32, 64, 128, 256, 512],
     Entities.Dead_Pumpkin: [1, 2, 4, 8, 16, 32, 64, 128, 256, 512],
     Entities.Apple: [1, 2, 4, 8, 16, 32],
-    Entities.Dinosaur: [1, 2, 4, 8, 16, 32]
+    Entities.Dinosaur: [1, 2, 4, 8, 16, 32],
 }
 
 EXPAND_SIZES = {
@@ -234,7 +236,7 @@ EXPAND_SIZES = {
     6: (12, 12),
     7: (16, 16),
     8: (22, 22),
-    9: (32, 32)
+    9: (32, 32),
 }
 
 PLANT_GROWTH_TIME_SECS = {
@@ -251,7 +253,7 @@ PLANT_GROWTH_TIME_SECS = {
 PLANT_YIELD_MULTS = {
     Entities.Grass: [1, 2, 4, 8, 16, 32, 64, 128, 256, 512],
     Entities.Bush: [1, 2, 4, 8, 16, 32, 64, 128, 256, 512],
-    Entities.Tree: [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
+    Entities.Tree: [1, 2, 4, 8, 16, 32, 64, 128, 256, 512],
 }
 
 FUNC_PREREQS = {
@@ -259,7 +261,7 @@ FUNC_PREREQS = {
     "plant": [(Unlocks.Plant, 1)],
     "clear": [(Unlocks.Plant, 1)],
     "change_hat": [(Unlocks.Hats, 1)],
-    "can_harvest" : [(Unlocks.Speed, 1)],
+    "can_harvest": [(Unlocks.Speed, 1)],
     "get_world_size": [(Unlocks.Expand, 2)],
     "till": [(Unlocks.Carrots, 1)],
     "move": [(Unlocks.Expand, 1)],
@@ -273,7 +275,7 @@ FUNC_PREREQS = {
     "measure": [(Unlocks.Sunflowers, 1), (Unlocks.Cactus, 1)],
     "swap": [(Unlocks.Cactus, 1)],
     "set_world_size": [(Unlocks.Debug_2, 1)],
-    "get_water": [(Unlocks.Watering, 1)]
+    "get_water": [(Unlocks.Watering, 1)],
 }
 
 PLANT_YIELD_MULTS.update(PLANT_COST_MULTS)
@@ -284,7 +286,15 @@ COMPANION_PLANTS = [Entities.Tree, Entities.Grass, Entities.Bush, Entities.Carro
 
 REQUIRES_SOIL = [Entities.Carrot, Entities.Pumpkin, Entities.Cactus, Entities.Sunflower]
 
-PLANTABLE = [Entities.Grass, Entities.Bush, Entities.Tree, Entities.Carrot, Entities.Pumpkin, Entities.Sunflower, Entities.Cactus]
+PLANTABLE = [
+    Entities.Grass,
+    Entities.Bush,
+    Entities.Tree,
+    Entities.Carrot,
+    Entities.Pumpkin,
+    Entities.Sunflower,
+    Entities.Cactus,
+]
 
 MAZE_ENTITIES = [Entities.Hedge, Entities.Treasure]
 
@@ -316,7 +326,7 @@ ENTITY_TO_ITEM = {
     Entities.Sunflower: Items.Power,
     Entities.Treasure: Items.Gold,
     Entities.Apple: Items.Bone,
-    Entities.Dinosaur: Items.Bone
+    Entities.Dinosaur: Items.Bone,
 }
 
 ENTITY_TO_UNLOCK = {
@@ -331,7 +341,7 @@ ENTITY_TO_UNLOCK = {
     Entities.Treasure: Unlocks.Mazes,
     Entities.Hedge: Unlocks.Mazes,
     Entities.Apple: Unlocks.Dinosaurs,
-    Entities.Dinosaur: Unlocks.Dinosaurs
+    Entities.Dinosaur: Unlocks.Dinosaurs,
 }
 
 ###########################
@@ -341,13 +351,11 @@ ENTITY_TO_UNLOCK = {
 ###########################
 
 
-
-
-
 def entity_to_upgrade_track(e: Entities) -> Unlocks:
     if e == Entities.Bush:
         return Unlocks.Trees
     return ENTITY_TO_UNLOCK[e]
+
 
 def entity_to_dense_print(e: Entities) -> str:
     match e:
@@ -376,6 +384,7 @@ def entity_to_dense_print(e: Entities) -> str:
         case Entities.Hedge:
             return "he"
 
+
 def item_to_unlock(item: Items) -> Unlocks:
     match item:
         case Items.Hay:
@@ -399,8 +408,10 @@ def item_to_unlock(item: Items) -> Unlocks:
         case Items.Water:
             return Unlocks.Watering
 
-def round2(value: Numeric) -> Numeric:
+
+def round2(value: float) -> float:
     return int(value * 100) / 100
+
 
 def coords_in_dir(dir: Direction, start: Coords) -> Coords:
     match dir:

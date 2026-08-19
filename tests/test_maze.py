@@ -1,6 +1,6 @@
-from tfwr.sim import *
-from tfwr.common import North, South, East, West
 import tests.test_utils as utility
+from tfwr.common import East, North, South, West
+from tfwr.sim import *
 
 
 def gen_maze() -> None:
@@ -20,10 +20,11 @@ def gen_maze() -> None:
     plant(Entities.Bush)
     use_item(Items.Weird_Substance, 32 * 9)
 
+
 def solve_maze() -> None:
-    right = {North:East, East:South, South:West, West:North}
-    left = {North:West, West:South, South:East, East:North}
-    back = {North:South, South:North, East:West, West:East}
+    right = {North: East, East: South, South: West, West: North}
+    left = {North: West, West: South, South: East, East: North}
+    back = {North: South, South: North, East: West, West: East}
     dir = North
     while get_entity_type() != Entities.Treasure:
         if can_move(right[dir]):
@@ -38,5 +39,6 @@ def solve_maze() -> None:
             move(back[dir])
             dir = back[dir]
     harvest()
+
 
 gen_maze()

@@ -1,5 +1,6 @@
 from tfwr.sim import *
 
+
 def sort_rowcol(dir) -> None:
     for i in range(get_world_size()):
         for j in range(get_world_size()):
@@ -8,6 +9,7 @@ def sort_rowcol(dir) -> None:
             if current > next:
                 swap(dir)
             move(dir)
+
 
 def cactus() -> None:
     clear()

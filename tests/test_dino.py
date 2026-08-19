@@ -1,7 +1,8 @@
-from tfwr.sim import *
-from tfwr.common import North, South, East, West, Coords
 import tests.test_utils as utility
+from tfwr.common import East, North, South, West
+from tfwr.sim import *
 from tfwr.sim import _farm
+
 
 def test_hat() -> None:
     utility.test_config(9)
@@ -26,6 +27,7 @@ def test_harvest() -> None:
         change_hat(Hats.Top_Hat)
         assert num_items(Items.Bone) == base_bones + 32 * 4**2
         print_entities()
+
 
 def test_collision() -> None:
     utility.test_config(16)
@@ -62,9 +64,8 @@ def test_collision() -> None:
     for i in range(5):
         move(East)
     print_dense_entity_grounds()
-    
+
 
 test_hat()
 test_harvest()
 test_collision()
-    

@@ -1,17 +1,20 @@
 import copy
 import json
 from typing import Any
-from tfwr.farm_tile import FarmTile
-from tfwr.farm import Farm
-import tfwr.harvester as harvester
-import tfwr.disjoint_set as disjoint_set
+
 import tfwr.fenwick_tree as fenwick
+from tfwr import disjoint_set
 from tfwr.common import *
+from tfwr.farm import Farm
+from tfwr.farm_tile import FarmTile
 
 _COORD_KEYS = [
-    "apple coords", "next apple coords", 
-    "treasure coords", "next treasure coords"
+    "apple coords",
+    "next apple coords",
+    "treasure coords",
+    "next treasure coords",
 ]
+
 
 def save_game(filepath, farm: Farm, allow_small_farm: bool) -> None:
     repr_json = _farm_to_json(farm, allow_small_farm)
@@ -20,11 +23,13 @@ def save_game(filepath, farm: Farm, allow_small_farm: bool) -> None:
         return
     raise FileNotFoundError(f"File {filepath} could not be written to!")
 
+
 def load_game(filepath) -> Farm:
     with open(filepath) as f:
         repr_json = json.loads(f.read())
         return _farm_from_json(repr_json)
     raise FileNotFoundError(f"File {filepath} not found!")
+
 
 def _tile_to_json(tile: FarmTile) -> dict[str, Any]:
     repr_json: dict[str, Any] = {}
@@ -45,8 +50,10 @@ def _tile_to_json(tile: FarmTile) -> dict[str, Any]:
         repr_json["growth left"] = tile.growth_left
     return repr_json
 
+
 def _tile_data_to_json(tile: FarmTile) -> dict[str, Any]:
     return copy.deepcopy(tile.data)
+
 
 def _farm_to_json(farm: Farm, allow_small_farm: bool) -> dict[str, Any]:
     items = {k.name: v for k, v in farm.items.items()}
@@ -63,9 +70,10 @@ def _farm_to_json(farm: Farm, allow_small_farm: bool) -> dict[str, Any]:
         "hat": farm.hat.name,
         "farm": farm_tiles,
         "data": data,
-        "require func unlocks": farm._require_func_unlocks
+        "require func unlocks": farm._require_func_unlocks,
     }
     return repr_json
+
 
 def _farm_data_to_json(data: dict[str, Any]) -> dict[str, Any]:
     repr_json = copy.deepcopy(data)
@@ -81,9 +89,11 @@ def _farm_data_to_json(data: dict[str, Any]) -> dict[str, Any]:
     _pumpkin_data_to_json(data, repr_json)
     return repr_json
 
+
 def _maze_data_to_json(data: dict[str, Any], repr_json: dict[str, Any]) -> None:
     def edge_to_list(e):
         return [list(e[0]), list(e[1])]
+
     # maze size, wall remove counter, and times reused do not require transformation.
     tiles = [list(coords) for coords in data["maze tiles"]]
     repr_json["maze tiles"] = tiles
@@ -94,18 +104,20 @@ def _maze_data_to_json(data: dict[str, Any], repr_json: dict[str, Any]) -> None:
     repr_json["treasure coords"] = list(data["treasure coords"])
     repr_json["next treasure coords"] = list(data["next treasure coords"])
 
+
 def _pumpkin_data_to_json(data: dict[str, Any], repr_json: dict[str, Any]) -> None:
     def tuple_to_str(t):
         return str(t)[1:-1]
+
     ps = data["pumpkins"]._data
     str_pumpkin = {tuple_to_str(k): tuple_to_str(v) for k, v in ps.items()}
     repr_json["pumpkins"] = str_pumpkin
-    
+
     sizes_by_coords = {}
     for coords, p_size in data["pumpkin sizes"].items():
         sizes_by_coords[tuple_to_str(coords)] = p_size
     repr_json["pumpkin sizes"] = sizes_by_coords
-    
+
     coords_by_sizes = {}
     for p_size, coords_set in data["pumpkin size locations"].items():
         coords_by_sizes[p_size] = [tuple_to_str(c) for c in coords_set]
@@ -115,6 +127,7 @@ def _pumpkin_data_to_json(data: dict[str, Any], repr_json: dict[str, Any]) -> No
     for coords, id in data["pumpkin ids"].items():
         pumpkin_ids[tuple_to_str(coords)] = id
     repr_json["pumpkin ids"] = pumpkin_ids
+
 
 def _farm_tiles_to_json(farm: Farm, allow_small: bool) -> list[list[dict[str, Any]]]:
     json_tiles = []
@@ -131,6 +144,7 @@ def _farm_tiles_to_json(farm: Farm, allow_small: bool) -> list[list[dict[str, An
             row.append(tile_json)
         json_tiles.append(row)
     return json_tiles
+
 
 def _tile_from_json(repr_json: dict[str, Any], coords: Coords) -> FarmTile:
     t = FarmTile(coords)
@@ -153,11 +167,9 @@ def _tile_from_json(repr_json: dict[str, Any], coords: Coords) -> FarmTile:
         t.companion = None
     if "water level" in repr_json:
         t.water_level = repr_json["water level"]
-    if "growth left" in repr_json:
-        t.growth_left = repr_json["growth left"]
-    else:
-        t.growth_left = 0
+    t.growth_left = repr_json.get("growth left", 0)
     return t
+
 
 def _farm_from_json(repr_json: dict[str, Any]) -> Farm:
     f = Farm()
@@ -178,8 +190,10 @@ def _farm_from_json(repr_json: dict[str, Any]) -> Farm:
     f.harvester.set_sunflower_data()
     return f
 
-def _farm_tiles_from_json(repr_json: list[list[dict[str, Any]]]
-                         ) -> list[list[FarmTile]]:
+
+def _farm_tiles_from_json(
+    repr_json: list[list[dict[str, Any]]],
+) -> list[list[FarmTile]]:
     farm_tiles: list[list[FarmTile]] = []
     for y in range(len(repr_json)):
         row = []
@@ -188,6 +202,7 @@ def _farm_tiles_from_json(repr_json: list[list[dict[str, Any]]]
             row.append(tile)
         farm_tiles.append(row)
     return farm_tiles
+
 
 def _farm_data_from_json(repr_json: dict[str, Any]) -> dict[str, Any]:
     data = {}
@@ -202,30 +217,32 @@ def _farm_data_from_json(repr_json: dict[str, Any]) -> dict[str, Any]:
     _pumpkin_data_from_json(repr_json, data)
     return data
 
+
 def _maze_data_from_json(repr_json: dict[str, Any], data: dict[str, Any]) -> None:
     def list_to_edge(l):
         return (tuple(l[0]), tuple(l[1]))
+
     data["maze size"] = repr_json["maze size"]
     data["wall remove counter"] = repr_json["wall remove counter"]
     data["times reused"] = repr_json["times reused"]
-    tiles = set(tuple(coords) for coords in repr_json["maze tiles"])
+    tiles = {tuple(coords) for coords in repr_json["maze tiles"]}
     data["maze tiles"] = tiles
-    walls = set(list_to_edge(l) for l in repr_json["walls"])
+    walls = {list_to_edge(l) for l in repr_json["walls"]}
     data["walls"] = walls
-    walls = set(list_to_edge(l) for l in repr_json["possible walls"])
+    walls = {list_to_edge(l) for l in repr_json["possible walls"]}
     data["possible walls"] = walls
     data["treasure coords"] = tuple(repr_json["treasure coords"])
     data["next treasure coords"] = tuple(repr_json["next treasure coords"])
 
-def _pumpkin_data_from_json(repr_json: dict[str, Any], 
-                            data: dict[str, Any]
-                           ) -> None:
+
+def _pumpkin_data_from_json(repr_json: dict[str, Any], data: dict[str, Any]) -> None:
     def str_to_int_tuple(s):
         return tuple(map(int, s.split(",")))
+
     ps = repr_json["pumpkins"]
     p_sets = {str_to_int_tuple(k): str_to_int_tuple(v) for k, v in ps.items()}
     data["pumpkins"] = disjoint_set.DisjointSet(p_sets)
-    
+
     sizes = {}
     for coords, p_size in repr_json["pumpkin sizes"].items():
         sizes[str_to_int_tuple(coords)] = p_size
@@ -233,13 +250,14 @@ def _pumpkin_data_from_json(repr_json: dict[str, Any],
 
     locations = {}
     for p_size, coords_list in repr_json["pumpkin size locations"].items():
-        locations[p_size] = set(str_to_int_tuple(c) for c in coords_list)
+        locations[p_size] = {str_to_int_tuple(c) for c in coords_list}
     data["pumpkin size locations"] = locations
 
     pumpkin_ids = {}
     for coords, id in repr_json["pumpkin ids"].items():
         pumpkin_ids[str_to_int_tuple(coords)] = id
     data["pumpkin ids"] = pumpkin_ids
+
 
 def _create_pumpkin_prefixes(f: Farm) -> None:
     f_tree = fenwick.FenwickTree(f.farm_x, f.farm_y)
@@ -249,4 +267,3 @@ def _create_pumpkin_prefixes(f: Farm) -> None:
             if tile.entity == Entities.Pumpkin and tile.is_grown():
                 f_tree.add(x, y, 1)
     f.data["pumpkin prefix"] = f_tree
-            

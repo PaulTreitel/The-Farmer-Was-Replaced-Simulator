@@ -1,14 +1,13 @@
 from __future__ import annotations
+
 import copy
 import random
 from typing import Any
+
+import tfwr.fenwick_tree as fenwick
+from tfwr import disjoint_set, harvester, maze, timer
 from tfwr.common import *
 from tfwr.farm_tile import FarmTile
-import tfwr.maze as maze
-import tfwr.harvester as harvester
-import tfwr.timer as timer
-import tfwr.disjoint_set as disjoint_set
-import tfwr.fenwick_tree as fenwick
 
 
 class Farm:
@@ -16,7 +15,7 @@ class Farm:
         if d is not None:
             for k, v in d.items():
                 setattr(self, k, v)
-        self.items: dict[Items, Numeric] = {i: 0 for i in Items}
+        self.items: dict[Items, float] = {i: 0 for i in Items}
         self.unlocks: dict[Unlocks, int] = {u: 0 for u in Unlocks}
         self.unlocks[Unlocks.Grass] = 1
         self.farm_x: int = 1
@@ -43,16 +42,18 @@ class Farm:
         self._update_size()
         self.timer.update_speed()
 
-    def set_items(self, items: dict[Items, Numeric]) -> None:
+    def set_items(self, items: dict[Items, float]) -> None:
         self.items = copy.deepcopy(items)
         for item, value in self.items.items():
             if item != Items.Power:
                 self.items[item] = int(value)
-    
+
     def give_unlock(self, unlock: Unlocks) -> None:
         if unlock in self.unlocks:
             if self.unlocks[unlock] == UNLOCK_COUNTS[unlock]:
-                raise UnlockError(f"You have already unlocked {unlock} to the maximum level")
+                raise UnlockError(
+                    f"You have already unlocked {unlock} to the maximum level"
+                )
             self.unlocks[unlock] += 1
         else:
             self.unlocks[unlock] = 1
@@ -62,7 +63,7 @@ class Farm:
             self.timer.update_speed()
         self._update_func_unlocks()
 
-    def add_item(self, item: Items, quantity: Numeric) -> None:
+    def add_item(self, item: Items, quantity: float) -> None:
         self.items[item] += quantity
 
     def get_tile(self, x, y) -> FarmTile:
@@ -76,12 +77,8 @@ class Farm:
     def wrap_coords(self, coords: Coords) -> Coords:
         return (coords[0] % self.farm_x, coords[1] % self.farm_y)
 
-    
-    
     # GAME INTERFACE
 
-    
-    
     def clear(self) -> None:
         if self._require_func_unlocks and "clear" not in self._func_unlocked:
             raise UnlockError("function clear() is not unlocked")
@@ -133,7 +130,6 @@ class Farm:
             id = random.randint(16, 2147483647)
             self.data["pumpkin ids"][(self.x, self.y)] = id
         return True
-        
 
     def change_hat(self, hat: Hats) -> None:
         if self._require_func_unlocks and "change_hat" not in self._func_unlocked:
@@ -190,7 +186,7 @@ class Farm:
         # dinosaur movement
         is_apple = self.current_tile.entity == Entities.Apple
         # constant expression for the for loop version given in game
-        dino_ticks = int(400 * 0.97**len(self.data["dinosaur tail"]))
+        dino_ticks = int(400 * 0.97 ** len(self.data["dinosaur tail"]))
         self.data["dinosaur tail"].append((self.x, self.y))
         self.data["dinosaur tail set"].add((self.x, self.y))
         self.current_tile.entity = Entities.Dinosaur
@@ -217,7 +213,6 @@ class Farm:
             self.get_tile(*c).entity = None
         self.timer.unchecked_ticks += dino_ticks
         return True
-        
 
     def get_ground_type(self) -> Grounds:
         if self._require_func_unlocks and "get_ground_type" not in self._func_unlocked:
@@ -225,7 +220,7 @@ class Farm:
         self.timer.unchecked_ticks += 1
         return self.current_tile.grounds
 
-    def get_entity_type(self) -> Entities|None:
+    def get_entity_type(self) -> Entities | None:
         if self._require_func_unlocks and "get_entity_type" not in self._func_unlocked:
             raise UnlockError("function get_entity_type() is not unlocked")
         self.timer.unchecked_ticks += 1
@@ -236,7 +231,7 @@ class Farm:
             raise UnlockError("function get_pos_x() is not unlocked")
         self.timer.unchecked_ticks += 1
         return self.x
-        
+
     def get_pos_y(self) -> int:
         if self._require_func_unlocks and "get_pos_y" not in self._func_unlocked:
             raise UnlockError("function get_pos_y() is not unlocked")
@@ -248,7 +243,7 @@ class Farm:
             raise UnlockError("function get_water() is not unlocked")
         return round2(self.current_tile.water_level)
 
-    def use_item(self, item: Items, quantity: int=1) -> bool:
+    def use_item(self, item: Items, quantity: int = 1) -> bool:
         # Usage fails if:
         # * cannot afford
         # * not a usable item
@@ -276,7 +271,7 @@ class Farm:
             tile.growth_left -= 2 * TICKS_PER_SECOND
         elif item == Items.Weird_Substance:
             return self._use_weird_substance(tile, quantity)
-        else: # use water
+        else:  # use water
             self.timer.clear_unchecked_ticks()
             for i in range(min(quantity, 4)):
                 self.current_tile.water()
@@ -310,7 +305,7 @@ class Farm:
             return new_coords not in self.data["dinosaur tail set"]
         return True
 
-    def get_companion(self) -> tuple[Entities, tuple[int, int]]|None:
+    def get_companion(self) -> tuple[Entities, tuple[int, int]] | None:
         if self._require_func_unlocks and "get_companion" not in self._func_unlocked:
             raise UnlockError("function get_companion() is not unlocked")
         self.timer.unchecked_ticks += 1
@@ -320,7 +315,7 @@ class Farm:
         c = self.wrap_coords((tmp[1], tmp[2]))
         return (tmp[0], c)
 
-    def measure(self, dir: Direction|None=None) -> Any:
+    def measure(self, dir: Direction | None = None) -> Any:
         if self._require_func_unlocks and "measure" not in self._func_unlocked:
             raise UnlockError("function measure() is not unlocked")
         self.timer.unchecked_ticks += 1
@@ -383,7 +378,7 @@ class Farm:
             thing = item_to_unlock(thing)
         return self.unlocks[thing]
 
-    def num_items(self, item: Items, takes_time=True) -> Numeric:
+    def num_items(self, item: Items, takes_time=True) -> float:
         # Function is not unlock-limited since you can't see item counts.
         # Normally requires Unlocks.Senses.
         if takes_time:
@@ -391,13 +386,10 @@ class Farm:
         if item == Items.Power:
             return round2(self.items[item])
         return int(self.items[item])
-        
 
-    def get_cost(self, 
-                 thing: Entities|Unlocks, 
-                 upgrade_level: int=-1,
-                 takes_time=True
-                ) -> dict[Items, int] | None:
+    def get_cost(
+        self, thing: Entities | Unlocks, upgrade_level: int = -1, takes_time=True
+    ) -> dict[Items, int] | None:
         # Function is not unlock-limited since there's no visual buyability
         # indicator.
         # Normally requires Unlocks.Costs.
@@ -441,12 +433,16 @@ class Farm:
         # Normally requires Unlocks.Auto_Unlock.
         prereq = UNLOCK_PREREQS[unlock]
         if prereq is not None and self.unlocks[prereq] == 0:
-            unsatisfied_prereq = f"[WARNING] You cannot unlock {unlock}, you need {prereq} first"
+            unsatisfied_prereq = (
+                f"[WARNING] You cannot unlock {unlock}, you need {prereq} first"
+            )
             self._send_warning(unsatisfied_prereq)
             self.timer.unchecked_ticks += 1
             return False
         if self.unlocks[unlock] == UNLOCK_COUNTS[unlock]:
-            max_unlocked = f"[WARNING] You have already unlocked {unlock} to the maximum level"
+            max_unlocked = (
+                f"[WARNING] You have already unlocked {unlock} to the maximum level"
+            )
             self._send_warning(max_unlocked)
             self.timer.unchecked_ticks += 1
             return False
@@ -460,13 +456,9 @@ class Farm:
         self._send_warning(no_resources)
         self.timer.unchecked_ticks += 1
         return False
-        
-        
 
     # INTERNAL IMPLEMENTATION
 
-
-    
     def _update_func_unlocks(self) -> None:
         self._func_unlocked = set()
         for f, reqs in FUNC_PREREQS.items():
@@ -480,9 +472,9 @@ class Farm:
             "pumpkin sizes": {},
             "pumpkin size locations": {i: set() for i in range(1, 33)},
             "pumpkin prefix": fenwick.FenwickTree(self.farm_x, self.farm_y),
-            "pumpkin ids": {}
+            "pumpkin ids": {},
         }
-                
+
     def _update_size(self) -> None:
         if self.unlocks[Unlocks.Expand] == 0:
             self.farm = [[FarmTile((0, 0))]]
@@ -509,21 +501,21 @@ class Farm:
         self._clear_data()
         self.timer.set_queue()
 
-    def _spend(self, spend_items: dict[Items, int]) -> bool:
+    def _spend(self, spend_items: dict[Items, float]) -> bool:
         for item, cost in spend_items.items():
             if self.items[item] < cost:
                 return False
-        for item in spend_items:
-            self.items[item] -= spend_items[item]
+        for item, quantity in spend_items.items():
+            self.items[item] -= quantity
         return True
 
-    def _use_weird_substance(self, tile: FarmTile, quantity: int) -> bool:
+    def _use_weird_substance(self, tile: FarmTile, quantity: float) -> bool:
         wrong_quantity = f"[WARNING] You used {quantity} Items.Weird_Substance, which isn't exactly the number needed to create a maze"
         cost = self.get_cost(Entities.Treasure, False)
         assert cost is not None
         cost = cost[Items.Weird_Substance]
         wrong_entity = tile.entity == Entities.Hedge or tile.entity == Entities.Apple
-        if  tile.entity is None or wrong_entity:
+        if tile.entity is None or wrong_entity:
             self.timer.unchecked_ticks += 1
             return False
         elif tile.entity == Entities.Treasure:
@@ -542,7 +534,7 @@ class Farm:
         self.timer.unchecked_ticks += 200
         return True
 
-    def _reuse_maze(self, quantity: int, cost: int) -> bool:
+    def _reuse_maze(self, quantity: float, cost: float) -> bool:
         if quantity != self.data["maze size"] * cost:
             self.timer.unchecked_ticks += 1
             return False
@@ -606,9 +598,7 @@ class Farm:
         if coords == (self.x, self.y):
             return False
         tile = self.get_tile(*coords)
-        if tile.entity not in [None, Entities.Grass]:
-            return False
-        return True
+        return tile.entity in [None, Entities.Grass]
 
     def _send_warning(self, msg: str) -> None:
         warnings = self._warning_issued.get(msg, 0)
@@ -618,5 +608,3 @@ class Farm:
         if warnings < 10:
             print(curr_msg)
             self._warning_issued[msg] = warnings + 1
-
-        

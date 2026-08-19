@@ -1,5 +1,6 @@
 from tfwr.sim import *
 
+
 def bush() -> None:
     for i in range(get_world_size()):
         for j in range(get_world_size()):

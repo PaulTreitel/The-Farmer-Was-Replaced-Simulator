@@ -1,5 +1,6 @@
+from tfwr.common import East, North, South, West
 from tfwr.sim import *
-from tfwr.common import North, South, East, West
+
 
 def goto(x, y=None) -> None:
     if y is None:
@@ -12,6 +13,7 @@ def goto(x, y=None) -> None:
         move(North)
     while get_pos_y() > y:
         move(South)
+
 
 def test_config(size) -> None:
     config_unlock_all()

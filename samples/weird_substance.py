@@ -1,5 +1,6 @@
 from tfwr.sim import *
 
+
 # Since trees give a lot of resources, this should get fertilizer pretty fast.
 def weird_substance_strat() -> None:
     for i in range(get_world_size()):
@@ -13,6 +14,7 @@ def weird_substance_strat() -> None:
                 plant(Entities.Bush)
             move(East)
         move(North)
+
 
 def weird_substance_constant() -> None:
     for i in range(get_world_size()):

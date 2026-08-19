@@ -1,8 +1,10 @@
 from __future__ import annotations
-import copy
+
 import random
-from tfwr.common import *
 from typing import Any
+
+from tfwr.common import *
+
 
 class FarmTile:
     def __init__(self, coords: Coords):
@@ -37,7 +39,7 @@ class FarmTile:
             self.growth_left = 0
         self._set_companion()
 
-    def harvest(self) -> Entities|None:
+    def harvest(self) -> Entities | None:
         if self.entity is None or self.growth_left > 0:
             return None
         tmp = self.entity
@@ -54,7 +56,7 @@ class FarmTile:
 
     def clear(self):
         self.grounds: Grounds = Grounds.Grassland
-        self.entity: Entities|None = Entities.Grass
+        self.entity: Entities | None = Entities.Grass
         self.data: dict[str, Any] = {}
         self.infected: bool = False
         self.growth_left = 200
@@ -75,7 +77,7 @@ class FarmTile:
             return
         self.infected = not self.infected
 
-    def get_companion(self) -> tuple[Entities, int, int]|None:
+    def get_companion(self) -> tuple[Entities, int, int] | None:
         if self.companion is None:
             return None
         x = self.coords[0] + self.companion[1]
@@ -104,7 +106,7 @@ class FarmTile:
         if self.is_grown() and self.entity not in UNHARVESTABLE:
             g += "✓"
         else:
-            g += ' '
+            g += " "
         return (e, g)
 
     def to_dense_tile_print(self) -> tuple[str, str]:
@@ -139,17 +141,16 @@ class FarmTile:
         if self.entity == Entities.Pumpkin:
             infected_print = "?"
         if self.infected:
-            infected_print += f",infect"
-        if self.growth_left < 0:
-            self.growth_left = 0
-            
+            infected_print += ",infect"
+        self.growth_left = max(self.growth_left, 0)
+
         return [
             str(self.coords),
             entity_print,
             self.grounds.name,
             f"{round2(self.growth_left / 400)}s left",
             f"{round2(self.water_level)} water",
-            infected_print
+            infected_print,
         ]
 
     def _set_companion(self) -> None:
@@ -163,7 +164,7 @@ class FarmTile:
         while dx == 0 and dy == 0:
             dx = random.randint(-3, 3)
             dy = random.randint(-3, 3)
-        self.companion: Companion|None = (companion, dx, dy)
+        self.companion: Companion | None = (companion, dx, dy)
 
     def __str__(self):
         return "\n".join(self.get_print())

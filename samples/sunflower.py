@@ -1,5 +1,6 @@
 from tfwr.sim import *
 
+
 def goto(x, y) -> None:
     while get_pos_x() < x:
         move(East)
@@ -9,6 +10,7 @@ def goto(x, y) -> None:
         move(North)
     while get_pos_y() > y:
         move(South)
+
 
 def sunflower_simple() -> None:
     for i in range(get_world_size()):
@@ -20,6 +22,7 @@ def sunflower_simple() -> None:
             plant(Entities.Sunflower)
             move(East)
         move(North)
+
 
 def sunflower_dict() -> None:
     locations = {15: [], 14: [], 13: [], 12: [], 11: [], 10: [], 9: [], 8: [], 7: []}

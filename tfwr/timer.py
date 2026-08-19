@@ -1,27 +1,28 @@
-import time
-from tfwr.common import *
 import random
-from tfwr.farm_tile import FarmTile
+
+from tfwr.common import *
 from tfwr.disjoint_set import DisjointSet
+from tfwr.farm_tile import FarmTile
 
 # Overall strategy:
 # When functions are called, we add unchecked ticks. These are the raw original
 # tick speeds (e.g., 200 for a `move()`) before speed upgrades and power. On
-# functions where the user requires up-to-date information, the unchecked 
+# functions where the user requires up-to-date information, the unchecked
 # ticks can be cleared and the farm is updated to its new state.
-
 
 
 TICKS_SPEEDUP_PER_POWER = 6000
 
+
 class Timer:
     def __init__(self, farm):
         from tfwr.farm import Farm
+
         self.farm: Farm = farm
-        self._ticks: Numeric = 0
-        self.unchecked_ticks: Numeric = 0
+        self._ticks: float = 0
+        self.unchecked_ticks: float = 0
         self._last_water_second: int = 0
-        self.growth_queue: dict[FarmTile, tuple[Numeric, Numeric]] = {}
+        self.growth_queue: dict[FarmTile, tuple[float, float]] = {}
         self.water_queue: set[FarmTile] = set()
         self.update_speed()
 
@@ -98,12 +99,10 @@ class Timer:
                 self._last_water_second += 1
                 self._reduce_water_levels()
 
-    def _grow_plant(self, 
-                    tile: FarmTile, 
-                    real_ticks: float, 
-                    planted_ticks: tuple[Numeric, Numeric]
-                   ) -> None:
-        true_real_ticks = self._ticks - planted_ticks[0] 
+    def _grow_plant(
+        self, tile: FarmTile, real_ticks: float, planted_ticks: tuple[float, float]
+    ) -> None:
+        true_real_ticks = self._ticks - planted_ticks[0]
         new_growth = true_real_ticks * (1 + 4 * tile.water_level)
         if tile.entity == Entities.Tree:
             x, y = tile.coords
@@ -147,10 +146,8 @@ class Timer:
             new_real = plant_real + plant_unchecked / tick_div
             self.growth_queue[tile] = (new_real, 0)
 
-    
     # PUMPKIN MERGING
 
-    
     def _merge_pumpkin(self, coords: Coords) -> None:
         self._update_new_pumpkin(coords)
         best = None
@@ -190,10 +187,9 @@ class Timer:
         p_size_extents[1].add(coords)
         self.farm.data["pumpkin prefix"].add(*coords, 1)
 
-    def _get_search_bounds(self, 
-                           coords: Coords, 
-                           size: int
-                          ) -> tuple[int, int, int, int]:
+    def _get_search_bounds(
+        self, coords: Coords, size: int
+    ) -> tuple[int, int, int, int]:
         px, py = coords
         left = max(0, px - size + 1)
         right = min(px, self.farm.farm_x - size)
@@ -213,11 +209,7 @@ class Timer:
             bottom = max(bottom, new_bottom)
         return left, right, top, bottom
 
-    def _bound_search_row(self, 
-                          c: Coords, 
-                          left: int, 
-                          right: int
-                         ) -> tuple[int, int]:
+    def _bound_search_row(self, c: Coords, left: int, right: int) -> tuple[int, int]:
         for x in range(c[0] - 1, left, -1):
             tile = self.farm.get_tile(x, c[1])
             if tile.entity != Entities.Pumpkin or tile.growth_left > 0:
@@ -230,11 +222,7 @@ class Timer:
                 break
         return left, right
 
-    def _bound_search_col(self, 
-                          c: Coords, 
-                          top: int, 
-                          bottom: int
-                         ) -> tuple[int, int]:
+    def _bound_search_col(self, c: Coords, top: int, bottom: int) -> tuple[int, int]:
         for y in range(c[1] - 1, bottom, -1):
             tile = self.farm.get_tile(c[0], y)
             if tile.entity != Entities.Pumpkin or tile.growth_left > 0:
@@ -252,11 +240,12 @@ class Timer:
         right_x = new_p[0] + new_p[2] - 1
         top_y = new_p[1] + new_p[2] - 1
         new_corners = [
-            (new_p[0], new_p[1]), 
-            (right_x, new_p[1]), 
-            (new_p[0], top_y), 
-            (right_x, top_y)
+            (new_p[0], new_p[1]),
+            (right_x, new_p[1]),
+            (new_p[0], top_y),
+            (right_x, top_y),
         ]
+
         def old_in_new_square(c: Coords) -> bool:
             return new_p[0] <= c[0] <= right_x and new_p[1] <= c[1] <= top_y
 
@@ -270,16 +259,16 @@ class Timer:
             # if the new pumpkin square and the old one overlap.
             if len(pumpkin_sets[i]) == 0:
                 continue
-            for (x, y) in pumpkin_sets[i]:
+            for x, y in pumpkin_sets[i]:
                 if x > right_x or x + i - 1 < new_p[0]:
                     continue
                 if y > top_y or y + i - 1 < new_p[1]:
                     continue
                 corners = [
-                    (x, y), 
-                    (x + i - 1, y), 
-                    (x, y + i - 1), 
-                    (x + i - 1, y + i - 1)
+                    (x, y),
+                    (x + i - 1, y),
+                    (x, y + i - 1),
+                    (x + i - 1, y + i - 1),
                 ]
                 s = (x, y, i)
                 c_inside = [old_in_new_square(c) for c in corners]
@@ -288,14 +277,13 @@ class Timer:
                     return True
                 c_inside = [new_in_old_square(c, s) for c in new_corners]
                 # If the old square is fully inside the new one and they share
-                # one corner, then it's a valid new pumpkin. This caused 
+                # one corner, then it's a valid new pumpkin. This caused
                 # substantial pain.
                 if sum(c_inside) == 1 and fully_inside:
                     continue
                 if 0 < sum(c_inside) < 4:
                     return True
         return False
-        
 
     def _square_full(self, x: int, y: int, size: int) -> bool:
         count = self.farm.data["pumpkin prefix"].rect(x, y, x + size, y + size)

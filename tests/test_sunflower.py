@@ -1,7 +1,6 @@
-from tfwr.sim import *
-from tfwr.common import North, South, East, West
 import tests.test_utils as utility
-from tfwr.sim import _farm
+from tfwr.common import East, North, South, West  # noqa: F401
+from tfwr.sim import *
 
 utility.test_config(32)
 
@@ -21,7 +20,7 @@ for i in range(get_world_size()):
 
 for i in range(10):
     do_a_flip()
-    
+
 utility.goto(petal_coords[15][0])
 print("first max")
 print(num_items(Items.Power))

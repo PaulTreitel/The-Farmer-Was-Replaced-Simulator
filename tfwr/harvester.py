@@ -1,8 +1,6 @@
-import copy
-from typing import Callable
+from operator import ge, le
+
 from tfwr.common import *
-import tfwr.disjoint_set as disjoint_set
-from operator import le, ge
 
 # Pumpkin infected formula
 # * Weird Substance = 0.5 * base value * size mult * # of infected tiles
@@ -12,16 +10,27 @@ from operator import le, ge
 # * no effect in 1-yield, half of 8-yield
 
 DINO_DATA_KEYS = [
-    "dinosaur tail", "apple coords", "next apple coords", "dinosaur tail set"
+    "dinosaur tail",
+    "apple coords",
+    "next apple coords",
+    "dinosaur tail set",
 ]
 MAZE_DATA_KEYS = [
-    "maze tiles", "treasure coords", "next treasure coords", "times reused", 
-    "walls", "possible walls", "maze size", "wall remove counter"
+    "maze tiles",
+    "treasure coords",
+    "next treasure coords",
+    "times reused",
+    "walls",
+    "possible walls",
+    "maze size",
+    "wall remove counter",
 ]
+
 
 class Harvester:
     def __init__(self, farm):
         from tfwr.farm import Farm
+
         self.farm: Farm = farm
         self._last_sunflower_highest = True
         self.data = {}
@@ -62,7 +71,7 @@ class Harvester:
         if "dinosaur tail" not in self.farm.data:
             return
         mult = self._get_harvest_mult(Entities.Apple)
-        bones_earned = mult * (len(self.farm.data["dinosaur tail"]))**2
+        bones_earned = mult * (len(self.farm.data["dinosaur tail"])) ** 2
         self.farm.add_item(Items.Bone, bones_earned)
         for coords in self.farm.data["dinosaur tail"]:
             self.farm.get_tile(*coords).entity = None
@@ -99,10 +108,10 @@ class Harvester:
 
         subsets = self.farm.data["pumpkins"]
         p_extents: dict[tuple[int, int], int] = self.farm.data["pumpkin sizes"]
-        p_sized_extents: dict[int, set[tuple[int, int]]] = (
-            self.farm.data["pumpkin size locations"]
-        )
-        
+        p_sized_extents: dict[int, set[tuple[int, int]]] = self.farm.data[
+            "pumpkin size locations"
+        ]
+
         coords = (self.farm.x, self.farm.y)
         base_mult = self._get_harvest_mult(Entities.Pumpkin)
         infected_count = 0
@@ -133,10 +142,12 @@ class Harvester:
     def _sunflower_harvest(self) -> bool:
         tile = self.farm.current_tile
         self.farm.timer.remove_queue(tile)
+
         def remove_sunflower():
             self.data["sunflower count"] -= 1
             self.data["sunflower sizes"][petal_count].discard(tile.coords)
             tile.harvest()
+
         assert "sunflower petals" in tile.data
         petal_count = tile.data["sunflower petals"]
         if not tile.is_grown():
@@ -146,7 +157,7 @@ class Harvester:
             remove_sunflower()
             self.farm.add_item(Items.Power, 1)
             return True
-            
+
         highest = self._get_highest_sunflower()
         current_matches_highest = tile.data["sunflower petals"] == highest
         if not self._last_sunflower_highest:
@@ -204,7 +215,7 @@ class Harvester:
         for coords in valid:
             self.farm.get_tile(*coords).harvest()
         mult = self._get_harvest_mult(Entities.Cactus)
-        num_cacti_earned = len(valid)**2 * mult
+        num_cacti_earned = len(valid) ** 2 * mult
         if infected_count > 0:
             weird_substance = mult * len(valid) * infected_count // 2
             self.farm.add_item(Items.Weird_Substance, weird_substance)
@@ -214,7 +225,9 @@ class Harvester:
 
     def _get_harvest_mult(self, plant_type: Entities) -> int:
         if plant_type not in PLANT_YIELD_MULTS:
-            raise EntityTypeError(f"Entity type {plant_type} does not have a harvest multiplier")
+            raise EntityTypeError(
+                f"Entity type {plant_type} does not have a harvest multiplier"
+            )
         upgrade_track = entity_to_upgrade_track(plant_type)
         tree_locked = self.farm.unlocks[Unlocks.Trees] == 0
         if plant_type == Entities.Bush and tree_locked:
@@ -225,7 +238,7 @@ class Harvester:
             mult *= 5
         return mult
 
-    def _get_companion_mult(self, companion_type: Companion|None) -> int:
+    def _get_companion_mult(self, companion_type: Companion | None) -> int:
         POLYCULTURE_MULTS = [5, 10, 20, 40, 80, 160]
         if companion_type is None:
             return 1
@@ -256,7 +269,7 @@ class Harvester:
             assert "cactus size" in curr.data
             size: int = curr.data["cactus size"]
             visited.add(curr_coords)
-            
+
             south_coords = coords_in_dir(South, curr_coords)
             north_coords = coords_in_dir(North, curr_coords)
             east_coords = coords_in_dir(East, curr_coords)
@@ -265,7 +278,7 @@ class Harvester:
             # Check if the neighbor tiles are sorted vs current tile. Only if
             # they are is this considered a valid productive cactus.
             expected = 4
-             # Yes this code is a bit of a mess. But it does work.
+            # Yes this code is a bit of a mess. But it does work.
             if self._acceptable_cactus_coords(south_coords, size, visited, le):
                 tiles_added.append(south_coords)
             elif not self.farm.valid_coords(south_coords):
@@ -290,12 +303,9 @@ class Harvester:
                 infected_count += 1
         return valid, infected_count
 
-    def _acceptable_cactus_coords(self, 
-                                  coords: Coords, 
-                                  curr_size: int,
-                                  visited: set[Coords], 
-                                  size_condition
-                                 ) -> bool:
+    def _acceptable_cactus_coords(
+        self, coords: Coords, curr_size: int, visited: set[Coords], size_condition
+    ) -> bool:
         # helper for cactus adjacency validation
         if not self.farm.valid_coords(coords):
             return False
@@ -303,4 +313,3 @@ class Harvester:
         sized = size_condition(tile.data["cactus size"], curr_size)
         ret = sized and tile.is_grown()
         return ret
-        

@@ -1,7 +1,6 @@
-from tfwr.sim import *
-from tfwr.common import North, South, East, West, REQUIRES_SOIL
 import tests.test_utils as utility
-from tfwr.sim import _farm
+from tfwr.common import REQUIRES_SOIL, East, North, South, West  # noqa: F401
+from tfwr.sim import *
 
 # Test predates timing/growth functionality
 
