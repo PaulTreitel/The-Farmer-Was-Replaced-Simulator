@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import copy
 import random
 from typing import Any
 
@@ -43,8 +42,7 @@ class Farm:
         self.timer.update_speed()
 
     def set_items(self, items: dict[Items, float]) -> None:
-        self.items = copy.deepcopy(items)
-        for item, value in self.items.items():
+        for item, value in items.items():
             if item != Items.Power:
                 self.items[item] = int(value)
 
@@ -212,6 +210,11 @@ class Farm:
             self.data["dinosaur tail set"].discard(c)
             self.get_tile(*c).entity = None
         self.timer.unchecked_ticks += dino_ticks
+        is_last_apple = len(self.data["dinosaur tail"]) == self.farm_y * self.farm_x - 1
+        if self.current_tile.entity == Entities.Apple and is_last_apple:
+            self.current_tile.entity = None
+            self.data["dinosaur tail"].append((self.x, self.y))
+            self.data["dinosaur tail set"].add((self.x, self.y))
         return True
 
     def get_ground_type(self) -> Grounds:
@@ -592,7 +595,8 @@ class Farm:
                     spawnable.append(tile.coords)
         if len(spawnable) == 0:
             return None
-        return random.choice(spawnable)
+        ret = random.choice(spawnable)
+        return ret
 
     def _valid_apple_coords(self, coords) -> bool:
         if coords == (self.x, self.y):

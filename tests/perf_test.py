@@ -76,7 +76,7 @@ def dinosaur_perf_test() -> None:
     state = dino.dino_setup()
     while state[dino.KEY_TAIL] < 500:
         dino.dino_goto(state, 0, 31)
-        if dino.get_to_apple_all(state):
+        if dino.collect_all_apples_cycle(state):
             print("Test ended early")
             print(f"my coords: {(get_pos_x(), get_pos_y())}")
             print(f"state is {state}")
