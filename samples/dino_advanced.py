@@ -93,7 +93,6 @@ def collect_all_apples_cycle(state) -> None:
         if state["apple y"] <= state["coil height"] + 1:
             break
         if state["apple x"] == get_pos_x():
-            print("apple x == pos x")
             break
         if state["apple x"] == WORLD_SIZE - 1 and state["apple y"] > get_pos_y():
             break
