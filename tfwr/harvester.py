@@ -75,7 +75,8 @@ class Harvester:
         self.farm.add_item(Items.Bone, bones_earned)
         for coords in self.farm.data["dinosaur tail"]:
             self.farm.get_tile(*coords).entity = None
-        self.farm.get_tile(*self.farm.data["apple coords"]).entity = None
+        if self.farm.data["apple coords"] is not None:
+            self.farm.get_tile(*self.farm.data["apple coords"]).entity = None
         for k in DINO_DATA_KEYS:
             self.data.pop(k, None)
         return

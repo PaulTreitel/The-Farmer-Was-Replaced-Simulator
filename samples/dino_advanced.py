@@ -116,11 +116,11 @@ def dino_setup() -> dict[str, Any]:
 
 def dino_solve() -> None:
     clear()
-    while True:
-        state = dino_setup()
-        while state["tail len"] < get_world_size() ** 2:
-            dino_goto(state, 0, WORLD_SIZE - 1)
-            collect_all_apples_cycle(state)
-            dino_goto(state, WORLD_SIZE - 1, 0)
-            if state["tail len"] >= MIN_COIL_LEN:
-                coil(state)
+    state = dino_setup()
+    while state["tail len"] < get_world_size() ** 2:
+        dino_goto(state, 0, WORLD_SIZE - 1)
+        collect_all_apples_cycle(state)
+        dino_goto(state, WORLD_SIZE - 1, 0)
+        if state["tail len"] >= MIN_COIL_LEN:
+            coil(state)
+    change_hat(Hats.Top_Hat)

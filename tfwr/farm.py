@@ -199,12 +199,16 @@ class Farm:
             else:
                 self.data["apple coords"] = self.data["next apple coords"]
                 self.data["next apple coords"] = None
-            new_apple_tile = self.get_tile(*self.data["apple coords"])
-            new_apple_tile.clear()
-            new_apple_tile.entity = Entities.Apple
-            new_apple_tile.grounds = Grounds.Soil
-            new_apple_tile.growth_left = 0
-            new_apple_tile.companion = None
+            if self.data["apple coords"] is not None:
+                new_apple_tile = self.get_tile(*self.data["apple coords"])
+                new_apple_tile.clear()
+                new_apple_tile.entity = Entities.Apple
+                new_apple_tile.grounds = Grounds.Soil
+                new_apple_tile.growth_left = 0
+                new_apple_tile.companion = None
+            elif self.current_tile.entity != Entities.Apple:
+                self.data["dinosaur tail"].append((self.x, self.y))
+                self.data["dinosaur tail set"].add((self.x, self.y))
         else:
             c = self.data["dinosaur tail"].pop(0)
             self.data["dinosaur tail set"].discard(c)

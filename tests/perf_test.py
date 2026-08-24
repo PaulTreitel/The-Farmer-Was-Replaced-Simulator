@@ -70,13 +70,13 @@ def weird_substance_perf_test() -> None:
 
 def dinosaur_perf_test() -> None:
     # This one doesn't really work because it's using my broken dino sample code.
-    import samples.dino as dino
+    import samples.dino_advanced as dino_advanced
     from tfwr.sim import _farm
 
-    state = dino.dino_setup()
-    while state[dino.KEY_TAIL] < 500:
-        dino.dino_goto(state, 0, 31)
-        if dino.collect_all_apples_cycle(state):
+    state = dino_advanced.dino_setup()
+    while state[dino_advanced.KEY_TAIL] < 500:
+        dino_advanced.dino_goto(state, 0, 31)
+        if dino_advanced.collect_all_apples_cycle(state):
             print("Test ended early")
             print(f"my coords: {(get_pos_x(), get_pos_y())}")
             print(f"state is {state}")
@@ -84,9 +84,9 @@ def dinosaur_perf_test() -> None:
             print_dense_entity_grounds()
             print("Test ended early")
             return
-        dino.dino_goto(state, 31, 0)
-        if state[dino.KEY_TAIL] >= dino.MIN_COIL_LEN:
-            dino.coil(state)
+        dino_advanced.dino_goto(state, 31, 0)
+        if state[dino_advanced.KEY_TAIL] >= dino_advanced.MIN_COIL_LEN:
+            dino_advanced.coil(state)
     print_dense_entity_grounds()
 
 
