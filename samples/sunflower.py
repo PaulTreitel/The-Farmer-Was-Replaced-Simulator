@@ -1,15 +1,5 @@
+from samples.utility import goto
 from tfwr.sim import *
-
-
-def goto(x, y) -> None:
-    while get_pos_x() < x:
-        move(East)
-    while get_pos_x() > x:
-        move(West)
-    while get_pos_y() < y:
-        move(North)
-    while get_pos_y() > y:
-        move(South)
 
 
 def sunflower_simple() -> None:

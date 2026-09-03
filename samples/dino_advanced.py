@@ -106,15 +106,13 @@ def collect_all_apples_cycle(state) -> None:
 
 
 def dino_setup() -> dict[str, Any]:
-    change_hat(Hats.Top_Hat)
-    goto(0, 0)
+    clear()
     change_hat(Hats.Dinosaur_Hat)
     apple_x, apple_y = measure()
     return {"tail len": 1, "apple x": apple_x, "apple y": apple_y, "coil height": 1}
 
 
 def dino_solve() -> None:
-    clear()
     state = dino_setup()
     while state["tail len"] < get_world_size() ** 2:
         dino_goto(state, 0, WORLD_SIZE - 1)

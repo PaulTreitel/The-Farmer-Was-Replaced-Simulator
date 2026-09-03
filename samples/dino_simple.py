@@ -1,5 +1,11 @@
 from tfwr.sim import *
 
+# Overall Strategy:
+# We're doing a simple Hamiltonian cycle that goes up the left column, then
+# snakes back and forth across the world (leaving the bottom row clear) until it
+# reaches the bottom right corner, then goes back to the bottom left corner and
+# repeats.
+
 
 def finished():
     n = can_move(North)
