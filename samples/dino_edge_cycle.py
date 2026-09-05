@@ -27,22 +27,38 @@ def dino_setup() -> dict[str, Any]:
     till_all()
     change_hat(Hats.Dinosaur_Hat)
     apple_x, apple_y = measure()
-    return {
+    state = {
         "tail len": 1,
         "apple x": apple_x,
         "apple y": apple_y,
         "tail": [(0, 0)],
+        # We store the tail as a list (it needs to be a queue) but for some
+        # reason the game will throw a "maximum comparison depth reached" error
+        # when checking list membership for a large enough list. So we also store
+        # the tail as a dict for quick membership checking. Since the algorithm
+        # is not perfect about duplicates in the list, we use a dict to count
+        # the number of times a coordinate is in the tail instead of a set.
+        "tail dict": {(0, 0): 1},
     }
+    return state
 
 
 def dino_move(state, dir) -> None:
+    coords = (get_pos_x(), get_pos_y())
     if get_entity_type() == Entities.Apple:
         state["apple x"], state["apple y"] = measure()
-    else:
-        state["tail"].pop(0)
-    state["tail"].append((get_pos_x(), get_pos_y()))
-    if move(dir) and get_entity_type() == Entities.Apple:
         state["tail len"] += 1
+    else:
+        tmp = state["tail"].pop(0)
+        state["tail dict"][tmp] -= 1
+        if state["tail dict"][tmp] == 0:
+            state["tail dict"].pop(tmp)
+    state["tail"].append(coords)
+    if coords in state["tail dict"]:
+        state["tail dict"][coords] += 1
+    else:
+        state["tail dict"][coords] = 1
+    move(dir)
     show_entities(state, SHOW_TIME, COILING)
 
 
@@ -67,11 +83,13 @@ def valid_apple_target(state, dir_moving) -> bool:
     if dir_moving == North:
         valid = valid and get_pos_y() < WORLD_SIZE - 2
         valid = valid and state["apple x"] != 0
-        valid = valid and (state["apple x"], state["apple y"] + 1) not in state["tail"]
+        return_coords = (state["apple x"], state["apple y"] + 1)
     if dir_moving == South:
         valid = valid and state["apple x"] != WORLD_SIZE - 1
         valid = valid and get_pos_y() > 1
-        valid = valid and (state["apple x"], state["apple y"] - 1) not in state["tail"]
+        return_coords = (state["apple x"], state["apple y"] - 1)
+    can_return = return_coords not in state["tail dict"]
+    valid = valid and can_return
     return valid
 
 
@@ -80,19 +98,19 @@ def coil(state) -> None:
 
     def coil_collide_west() -> bool:
         for i in range(1, get_pos_x()):
-            if (i, get_pos_y() + 1) not in state["tail"]:
-                return True
-        return False
+            if (i, get_pos_y() + 1) not in state["tail dict"]:
+                return i
+        return -1
 
     def coil_goto(x) -> None:
         if get_pos_x() < x:
             for i in range(x - get_pos_x()):
                 dino_move(state, East)
         else:
-            for i in range(get_pos_x() - x):
-                if not coil_collide_west():
-                    break
-                dino_move(state, West)
+            endpoint = coil_collide_west()
+            if endpoint != -1:
+                for i in range(get_pos_x() - endpoint):
+                    dino_move(state, West)
 
     COILING = True
     len_coiled = WORLD_SIZE - 1
@@ -104,12 +122,10 @@ def coil(state) -> None:
     while len_coiled < state["tail len"] - 2 * WORLD_SIZE:
         dino_move(state, North)
         x = get_pos_x()
-        # dino_goto(state, 1, num_coils)
         coil_goto(1)
         len_coiled += x - get_pos_x()
         dino_move(state, North)
         x = get_pos_x()
-        # dino_goto(state, WORLD_SIZE - 1, num_coils + 1)
         coil_goto(WORLD_SIZE - 1)
         len_coiled += get_pos_x() - x
         len_coiled += 2
@@ -132,6 +148,9 @@ def dino_cycle() -> None:
 
             if valid_apple_target(state, North):
                 while get_entity_type() != Entities.Apple:
+                    if state["tail len"] >= WORLD_SIZE**2:
+                        # change_hat(Hats.Top_Hat)
+                        return
                     dino_move(state, West)
                 dino_move(state, North)
                 while get_pos_x() < WORLD_SIZE - 1:
@@ -149,3 +168,6 @@ def dino_cycle() -> None:
                 dino_move(state, South)
                 while get_pos_x() > 0:
                     dino_move(state, West)
+
+
+dino_cycle()
